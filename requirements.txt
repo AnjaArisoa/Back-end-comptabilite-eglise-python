@@ -1,0 +1,8 @@
+alembic==1.13.2
+fast-depends==2.1.9
+fastapi==0.111.1
+fastapi-cli==0.0.4
+fastapi-mail==1.4.1
+SQLAlchemy==2.0.31
+sqlmodel==0.0.21
+psycopg2-binary==2.9.9
