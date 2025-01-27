@@ -47,7 +47,7 @@ class Entree(TimestampMixin,table=True):
     __table_args__ = (Index("ix_entree_id", "idEntree"),)
 
 class DetailEntree(TimestampMixin,table=True):
-    idDetailEntree:Optional[str]=Field(default=None,primary_key=True)
+    idDetailEntree:Optional[int]=Field(default=None,primary_key=True)
     entree_id:Optional[str]=Field(foreign_key="entree.idEntree")
     montant:Optional[float]
     quantite:Optional[int]=0
