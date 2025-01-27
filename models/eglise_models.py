@@ -3,8 +3,10 @@ from typing import List, Optional
 from datetime import date, datetime, timedelta, time
 from enum import Enum
 from sqlalchemy import Index
+from sqlmodel import Session, select,func,extract
 from sqlalchemy import PrimaryKeyConstraint, Index, UniqueConstraint
 from core.utils import *
+from sqlalchemy import text 
 
 
 class StatusEnum(str, Enum):
@@ -55,6 +57,30 @@ class DetailEntree(TimestampMixin,table=True):
     entree: List["Entree"] = Relationship(back_populates="detailEntree")
     __table_args__ = (Index("ix_detail_entree_id", "idDetailEntree"),)
 
+
+def generate_custom_id_sortie(session: Session) -> str:
+    statement = select(Sortie.idSortie).order_by(Sortie.idSortie.desc()).limit(1)
+    result = session.exec(statement).first() 
+    if result :
+        last_id = result
+        number_part = int(last_id[3:])  
+        new_id = f"STR{number_part + 1:03d}"  
+    else:
+        new_id = "STR001"
+    
+    return new_id
+
+def generate_custom_id_entree(session: Session) -> str:
+    statement = select(Entree.idEntree).order_by(Entree.idEntree.desc()).limit(1)
+    result = session.exec(statement).first() 
+    if result :
+        last_id = result
+        number_part = int(last_id[3:])  
+        new_id = f"ETR{number_part + 1:03d}"  
+    else:
+        new_id = "ETR001"
+    
+    return new_id
 
 
 
