@@ -5,4 +5,4 @@ fastapi-cli==0.0.4
 fastapi-mail==1.4.1
 SQLAlchemy==2.0.31
 sqlmodel==0.0.21
-psycopg2-binary==2.9.9
+

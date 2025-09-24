@@ -1,8 +1,8 @@
-"""  migration
+"""Initial migration
 
-Revision ID: 132978b25a27
+Revision ID: fc5efedfa4b8
 Revises: 
-Create Date: 2025-01-27 15:35:54.128303
+Create Date: 2025-08-18 12:21:19.127672
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = '132978b25a27'
+revision = 'fc5efedfa4b8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,6 +28,14 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('idEntree')
     )
     op.create_index('ix_entree_id', 'entree', ['idEntree'], unique=False)
+    op.create_table('montant',
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('idMontant', sa.Integer(), nullable=False),
+    sa.Column('montant', sa.Float(), nullable=True),
+    sa.PrimaryKeyConstraint('idMontant')
+    )
+    op.create_index('ix_montant_id', 'montant', ['idMontant'], unique=False)
     op.create_table('sortie',
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -49,7 +57,7 @@ def upgrade() -> None:
     op.create_table('detailentree',
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('idDetailEntree', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('idDetailEntree', sa.Integer(), nullable=False),
     sa.Column('entree_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('montant', sa.Float(), nullable=True),
     sa.Column('quantite', sa.Integer(), nullable=True),
@@ -71,6 +79,8 @@ def downgrade() -> None:
     op.drop_table('type')
     op.drop_index('ix_sortie_id', table_name='sortie')
     op.drop_table('sortie')
+    op.drop_index('ix_montant_id', table_name='montant')
+    op.drop_table('montant')
     op.drop_index('ix_entree_id', table_name='entree')
     op.drop_table('entree')
     # ### end Alembic commands ###
