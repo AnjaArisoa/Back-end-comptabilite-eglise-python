@@ -1,43 +1,34 @@
-import os
+import sys, os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 from alembic import context
 from dotenv import load_dotenv
 
-# charger .env (optionnel si Render fournit DATABASE_URL)
+# Ajouter le src au path
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+# Charger .env
 load_dotenv()
 
+# Importer Base
+from core.database import Base
+
 config = context.config
+fileConfig(config.config_file_name)
 
-# Remplacer l'URL de la config par celle de l'environnement
+# URL depuis l'env
 DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL is None:
+if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL non défini")
-
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
-# Logging
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
-
-# importer vos modèles
-from core.database import Base  # ou le module où Base = SQLModel.metadata
-
-target_metadata = Base.metadata
+target_metadata = Base
 
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url,
-        target_metadata=target_metadata,
-        literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
-    )
-
+    context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
     with context.begin_transaction():
         context.run_migrations()
-
 
 def run_migrations_online():
     connectable = engine_from_config(
@@ -45,13 +36,10 @@ def run_migrations_online():
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
-
         with context.begin_transaction():
             context.run_migrations()
-
 
 if context.is_offline_mode():
     run_migrations_offline()
