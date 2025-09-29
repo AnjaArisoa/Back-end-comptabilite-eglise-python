@@ -25,6 +25,7 @@ class Type(TimestampMixin,table=True):
     idType:Optional[int] = Field(default=None, primary_key=True)
     nom:Optional[str]
     detailEntree:List["DetailEntree"] = Relationship(back_populates="type")
+    recettes: list["Recette"] = Relationship(back_populates="type")
     __table_args__ = (Index("ix_type_id", "idType"),)
 
 class Montant(TimestampMixin,table=True):
@@ -56,6 +57,17 @@ class DetailEntree(TimestampMixin,table=True):
     type: List["Type"] = Relationship(back_populates="detailEntree")
     entree: List["Entree"] = Relationship(back_populates="detailEntree")
     __table_args__ = (Index("ix_detail_entree_id", "idDetailEntree"),)
+    
+class Recette(TimestampMixin,table=True):
+    idRecette:Optional[int]=Field(default=None,primary_key=True)
+    date:date
+    libelle:Optional[str]
+    debit_montant:Optional[float]=0
+    credit_montant:Optional[float]=0
+    solde:Optional[float]=0
+    type_id: Optional[int] = Field(foreign_key="type.idType")
+    type: Optional[Type] = Relationship(back_populates="recettes")
+    __table_args__ = (Index("ix_recette_id", "idRecette"),)
 
 
 def generate_custom_id_sortie(session: Session) -> str:
