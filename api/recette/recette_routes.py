@@ -66,7 +66,7 @@ def create_recette(recette_data: RecetteCreate, db: Session = Depends(get_sessio
     db.refresh(nouvelle_recette)
     
     # Recalculer tous les soldes après cette date
-    recalculer_soldes_apres_date(db, recette_data.date)
+    recalculer_soldes_apres_date(db, recette_data.date,recette_data.type_id)
     
     return nouvelle_recette
 # ============= CRUD UPDATE =============
@@ -98,27 +98,11 @@ def update_recette(
     
     # Recalculer les soldes à partir de la date la plus ancienne
     date_recalcul = min(ancienne_date, recette.date)
-    recalculer_soldes_apres_date(db, date_recalcul)
+    recalculer_soldes_apres_date(db, date_recalcul,recette_data.type_id)
     
     db.refresh(recette)
     return recette
 
-# ============= CRUD DELETE =============
-@router.delete("/{idRecette}")
-def delete_recette(idRecette: int, db: Session = Depends(get_session)):
-    """Supprimer une recette et recalculer les soldes"""
-    recette = db.get(Recette, idRecette)
-    if not recette:
-        raise HTTPException(status_code=404, detail="Recette non trouvée")
-    
-    date_suppression = recette.date
-    db.delete(recette)
-    db.commit()
-    
-    # Recalculer les soldes après la date de suppression
-    recalculer_soldes_apres_date(db, date_suppression)
-    
-    return {"message": "Recette supprimée avec succès"}
 
 @router.get("/", response_model=List[RecetteResponse])
 def get_all_recettes(
@@ -148,39 +132,8 @@ def get_all_recettes(
     recettes = db.exec(stmt).all()
     return recettes
 
-# ============= CRUD UPDATE =============
-@router.put("/{idRecette}", response_model=RecetteResponse)
-def update_recette(
-    idRecette: int,
-    recette_data: RecetteUpdate,
-    db: Session = Depends(get_session)
-):
-    """Mettre à jour une recette et recalculer les soldes"""
-    recette = db.get(Recette, idRecette)
-    if not recette:
-        raise HTTPException(status_code=404, detail="Recette non trouvée")
-    
-    ancienne_date = recette.date
-    
-    # Mettre à jour les champs
-    if recette_data.date is not None:
-        recette.date = recette_data.date
-    if recette_data.libelle is not None:
-        recette.libelle = recette_data.libelle
-    if recette_data.debit_montant is not None:
-        recette.debit_montant = recette_data.debit_montant
-    if recette_data.credit_montant is not None:
-        recette.credit_montant = recette_data.credit_montant
-    
-    db.add(recette)
-    db.commit()
-    
-    # Recalculer les soldes à partir de la date la plus ancienne
-    date_recalcul = min(ancienne_date, recette.date)
-    recalculer_soldes_apres_date(db, date_recalcul)
-    
-    db.refresh(recette)
-    return recette
+
+
 
 # ============= CRUD DELETE =============
 @router.delete("/{idRecette}")
@@ -193,9 +146,6 @@ def delete_recette(idRecette: int, db: Session = Depends(get_session)):
     date_suppression = recette.date
     db.delete(recette)
     db.commit()
-    
-    # Recalculer les soldes après la date de suppression
-    recalculer_soldes_apres_date(db, date_suppression)
     
     return {"message": "Recette supprimée avec succès"}
 
