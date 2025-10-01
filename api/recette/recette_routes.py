@@ -311,17 +311,18 @@ def get_rapport_annuel(
             "numero_mois": mois,
             "nombre_operations": len(recettes_mois),
             "recettes": [
-                {
-                    "idRecette": r.idRecette,
-                    "date": r.date,
-                    "libelle": r.libelle,
-                    "debit_montant": r.debit_montant,
-                    "credit_montant": r.credit_montant,
-                    "solde": r.solde,
-                    "type": {"id": r.type.idType, "nom": r.type.nom} if r.type else None
-                }
-                for r in recettes_mois
-            ],
+    {
+        "idRecette": r.idRecette,
+        "date": (r.date if i == 0 or r.date != recettes_mois[i-1].date else None),
+        "libelle": r.libelle,
+        "debit_montant": r.debit_montant,
+        "credit_montant": r.credit_montant,
+        "solde": r.solde,
+        "type": {"id": r.type.idType, "nom": r.type.nom} if r.type else None
+    }
+    for i, r in enumerate(recettes_mois)
+],
+
             "total_debits": total_debits,
             "total_credits": total_credits,
             "solde_fin_mois": solde_fin_mois
