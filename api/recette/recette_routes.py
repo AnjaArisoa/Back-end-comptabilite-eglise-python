@@ -46,7 +46,7 @@ def create_recette(recette_data: RecetteCreate, db: Session = Depends(get_sessio
     """Créer une nouvelle recette avec calcul automatique du solde"""
     
     # Récupérer le solde antérieur à cette date
-    solde_anterieur = get_solde_anterieur(db, recette_data.date)
+    solde_anterieur = get_solde_anterieur(db, recette_data.date,recette_data.type_id)
     
     # Calculer le nouveau solde
     nouveau_solde = solde_anterieur - recette_data.debit_montant + recette_data.credit_montant
