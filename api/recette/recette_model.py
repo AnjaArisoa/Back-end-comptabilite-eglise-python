@@ -17,6 +17,7 @@ class RecetteUpdate(BaseModel):
     debit_montant: Optional[float] = None
     credit_montant: Optional[float] = None
     type_id: Optional[int] = None
+    solde:Optional[int]=None
 
 class TypeResponse(BaseModel):
     idType: int

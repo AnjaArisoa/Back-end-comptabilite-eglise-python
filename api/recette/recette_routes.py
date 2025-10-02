@@ -92,6 +92,8 @@ def update_recette(
         recette.debit_montant = recette_data.debit_montant
     if recette_data.credit_montant is not None:
         recette.credit_montant = recette_data.credit_montant
+    if recette_data.solde is not None:
+        recette.solde = recette_data.solde
     
     db.add(recette)
     db.commit()
