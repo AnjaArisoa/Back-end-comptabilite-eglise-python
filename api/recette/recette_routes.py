@@ -295,9 +295,9 @@ def get_rapport_annuel(
         # (dernière recette du mois, tous types confondus pour avoir le vrai solde)
         stmt_solde = (
             select(Recette)
-            .where(Recette.date <= dernier_jour)
-            .order_by(Recette.date.desc(), Recette.idRecette.desc())
-            .limit(1)
+        .where(Recette.date < dernier_jour, Recette.type_id == type_id)
+        .order_by(Recette.date.desc(), Recette.idRecette.desc())
+        .limit(1)
         )
         derniere_recette = db.exec(stmt_solde).first()
         solde_fin_mois = derniere_recette.solde if derniere_recette else 0
